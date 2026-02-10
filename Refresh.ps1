@@ -2,10 +2,18 @@
 # oliver@donfi.com
 
 # declare some variables...
+# url for local Immich API
 $immich = 'http://192.168.0.203:2283/api/'
-$apikey = 'qjnCx0JDTT7KJe5jvd7oadph7ndNVc5rbOCmNptGF0'
+# Immich API key
+$apikey = '[REDACTED]'
+# how many images to transfer
 $max_images = 200
-$fully = 'http://192.168.0.155:2323/?password=kiosk4919'
+# url of the Fully Kiosk API
+$fully = 'http://192.168.0.155:2323/?password=[REDACTED]'
+# url of the web server where zipped images will be available from
+$nginx = 'http://192.168.0.206'
+# location of the Fully Kiosk privileged storaga on the Android tablet
+$filelocation = 'storage/emulated/0/Android/data/de.ozerov.fully/files'
 
 # clear the working output folder & zip file
 Write-Output "Initializing..."
@@ -39,7 +47,7 @@ cp ./screensaver.zip /data/www/zip
 
 # invoke the command on Fully Kiosk to delete the current screensaver folder
 Write-Output "Clearing files from Fully Kiosk on tablet..."
-$uri = $fully + 'cmd=deleteFolder&foldername=storage/emulated/0/Android/data/de.ozerov.fully/files/Screensaver'
+$uri = $fully + 'cmd=deleteFolder&foldername=' + $filelocation + '/Screensaver'
 $output = Invoke-RestMethod -Uri $uri
 if ($output -contains "<p class='success'") {
         Write-Output "Success!"
@@ -47,7 +55,7 @@ if ($output -contains "<p class='success'") {
 
 # invoke the command on Fully Kiosk to upload and unzip the current zip file
 Write-Output "Telling Fully Kiosk to download and unzip the archive..."
-$uri = $fully + '&cmd=loadZipFile&url=http://192.168.0.206/zip/screensaver.zip'
+$uri = $fully + '&cmd=loadZipFile&url=' + $nginx + '/zip/screensaver.zip'
 $output = Invoke-RestMethod -Uri $uri
 if ($output -contains "<p class='success'") {
         Write-Output "Success!"
